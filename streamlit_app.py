@@ -36,11 +36,7 @@ from sklearn.metrics import (
 )
 from google.colab import files
 files.upload()
-!mkdir -p ~/.kaggle
-!cp kaggle.json ~/.kaggle/
-!chmod 600 ~/.kaggle/kaggle.json
-!kaggle datasets download -d blastchar/telco-customer-churn
-!unzip -o telco-customer-churn.zip
+
 
 df = pd.read_csv("WA_Fn-UseC_-Telco-Customer-Churn.csv")
 
