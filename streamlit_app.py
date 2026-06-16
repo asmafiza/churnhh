@@ -9,6 +9,10 @@ Original file is located at
 
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import StandardScaler  # Sab se upar
+
+# ... baqi ka code ...
+
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -88,6 +92,11 @@ X = X.fillna(0)
 # Aapki line 91 ab bina kisi error ke chalegi
 X_scaled = scaler.fit_transform(X)
 
+
+X = df.drop(columns=['Churn']).select_dtypes(include=['number']).fillna(0)
+
+scaler = StandardScaler()  # Yeh lazmi define karein
+X_scaled = scaler.fit_transform(X)
 y = df["Churn"]
 # Scaling
 
