@@ -139,23 +139,18 @@ for name, model in models.items():
 
     accuracy = accuracy_score(
         y_test,
-        pred
+        pred,
+         pos_label='Yes'
     )
 
-    precision = precision_score(
-        y_test,
-        pred
-    )
+precision = precision_score(
+    y_test,
+    pred,
+    pos_label='Yes'  # Apni asli positive class ka naam yahan likhein
+)
 
-    recall = recall_score(
-        y_test,
-        pred
-    )
-
-    f1 = f1_score(
-        y_test,
-        pred
-    )
+recall = recall_score(y_test, pred, average='macro')
+f1 = f1_score(y_test, pred, average='macro')
 
     results.append([
         name,
