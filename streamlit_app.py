@@ -160,14 +160,14 @@ results.append([
     f1
     ])
 
-    print("\n====================")
-    print(name)
-    print("====================")
+print("\n====================")
+print(name)
+print("====================")
 
-    print(
-        classification_report(
-            y_test,
-            pred
+print(
+    classification_report(
+        y_test,
+        pred
         )
     )
 
