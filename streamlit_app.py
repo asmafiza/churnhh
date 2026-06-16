@@ -71,7 +71,7 @@ sns.countplot(x="Churn", data=df)
 
 plt.title("Customer Churn Distribution")
 
-plt.show()
+st.pyplot(plt)
 
 plt.figure(figsize=(14,10))
 
@@ -82,7 +82,7 @@ sns.heatmap(
 
 plt.title("Correlation Heatmap")
 
-plt.show()
+st.pyplot(plt)
 
 # Features and Target
 X = df.drop(columns=['Churn']) # Churn aapka target column hoga
