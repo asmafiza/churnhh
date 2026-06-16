@@ -221,6 +221,19 @@ X = df.drop("Churn", axis=1)
 y = df["Churn"]
 # Scaling
 scaler = StandardScaler()
+# Line 224 se theek PEHLE yeh lines add karein:
+# 1. Target column (e.g., 'Churn') agar majood hai to drop karein
+if 'Churn' in X.columns:
+    X = X.drop(columns=['Churn'])
+
+# 2. Sirf number wale columns select karein (Taake Text/String columns khatam ho jayein)
+X = X.select_dtypes(include=['number'])
+
+# 3. Agar koi missing value (khali cell) hai to usay 0 se bhar dein
+X = X.fillna(0)
+
+# Aapki Line 224 ab bilkul sahi chalegi:
+X_scaled = scaler.fit_transform(X)
 X_scaled = scaler.fit_transform(X)
 # Train Test Split
 X_train, X_test, y_train, y_test = train_test_split(
