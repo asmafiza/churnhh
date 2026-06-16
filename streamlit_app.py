@@ -72,7 +72,7 @@ plt.show()
 plt.figure(figsize=(14,10))
 
 sns.heatmap(
-    df.corr(),
+    df.corr(numeric_only=True),
     cmap="coolwarm"
 )
 
