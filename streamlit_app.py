@@ -81,7 +81,12 @@ plt.title("Correlation Heatmap")
 plt.show()
 
 # Features and Target
-X = df.drop("Churn", axis=1)
+X = df.drop(columns=['Churn']) # Churn aapka target column hoga
+X = X.select_dtypes(include=['number'])
+X = X.fillna(0)
+
+# Aapki line 91 ab bina kisi error ke chalegi
+X_scaled = scaler.fit_transform(X)
 
 y = df["Churn"]
 # Scaling
