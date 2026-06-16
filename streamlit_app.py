@@ -137,10 +137,8 @@ for name, model in models.items():
 
     pred = model.predict(X_test)
 
-    accuracy = accuracy_score(
-        y_test,
-        pred,
-         pos_label='Yes'
+# Sahi Tareeqa:
+accuracy = accuracy_score(y_test, pred)
     )
 
 precision = precision_score(
