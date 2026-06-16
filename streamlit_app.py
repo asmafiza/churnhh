@@ -34,8 +34,7 @@ from sklearn.metrics import (
     confusion_matrix,
     classification_report
 )
-from google.colab import files
-files.upload()
+
 
 
 df = pd.read_csv("WA_Fn-UseC_-Telco-Customer-Churn.csv")
