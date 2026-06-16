@@ -71,7 +71,7 @@ sns.countplot(x="Churn", data=df)
 
 plt.title("Customer Churn Distribution")
 
-st.pyplot(plt)
+plt.show()
 
 plt.figure(figsize=(14,10))
 
@@ -82,7 +82,7 @@ sns.heatmap(
 
 plt.title("Correlation Heatmap")
 
-st.pyplot(plt)
+plt.show()
 # Pehle figure banayein
 fig, ax = plt.subplots()
 
