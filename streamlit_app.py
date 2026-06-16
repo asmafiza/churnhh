@@ -171,24 +171,24 @@ print(
         )
     )
 
-    cm = confusion_matrix(
-        y_test,
-        pred
+cm = confusion_matrix(
+     y_test,
+     pred
     )
 
-    plt.figure(figsize=(5,4))
+plt.figure(figsize=(5,4))
 
-    sns.heatmap(
-        cm,
-        annot=True,
-        fmt="d"
+sns.heatmap(
+    cm,
+    annot=True,
+    fmt="d"
     )
 
-    plt.title(
-        f"Confusion Matrix - {name}"
+plt.title(
+    f"Confusion Matrix - {name}"
     )
 
-    plt.show()
+plt.show()
 # Comparison Table
 results_df = pd.DataFrame(
     results,
