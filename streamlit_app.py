@@ -294,7 +294,7 @@ plt.show()
 # Cluster Analysis
 
 print(
-    df.groupby("Cluster").mean()
+    df.groupby("Cluster").mean(numeric_only=True)
 )
 # BUSINESS INSIGHTS
 print("\nBusiness Insights")
