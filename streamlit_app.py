@@ -152,12 +152,12 @@ precision = precision_score(
 recall = recall_score(y_test, pred, average='macro')
 f1 = f1_score(y_test, pred, average='macro')
 
-    results.append([
-        name,
-        accuracy,
-        precision,
-        recall,
-        f1
+results.append([
+    name,
+    accuracy,
+    precision,
+    recall,
+    f1
     ])
 
     print("\n====================")
