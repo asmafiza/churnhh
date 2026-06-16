@@ -89,13 +89,15 @@ X = df.drop(columns=['Churn']) # Churn aapka target column hoga
 X = X.select_dtypes(include=['number'])
 X = X.fillna(0)
 
-# Aapki line 91 ab bina kisi error ke chalegi
-X_scaled = scaler.fit_transform(X)
 
 
-X = df.drop(columns=['Churn']).select_dtypes(include=['number']).fillna(0)
+# 2. Phir data tayyar karein
+X = df.drop(columns=['Churn'], errors='ignore').select_dtypes(include=['number']).fillna(0)
 
-scaler = StandardScaler()  # Yeh lazmi define karein
+# 3. Scaler ka object banayein (Yeh line fit_transform se PEHLE honi chahiye)
+scaler = StandardScaler()
+
+# 4. Ab data ko scale karein
 X_scaled = scaler.fit_transform(X)
 y = df["Churn"]
 # Scaling
