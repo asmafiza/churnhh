@@ -139,7 +139,7 @@ for name, model in models.items():
 
 # Sahi Tareeqa:
 accuracy = accuracy_score(y_test, pred)
-    )
+    
 
 precision = precision_score(
     y_test,
