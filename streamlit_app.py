@@ -85,9 +85,9 @@ plt.title("Correlation Heatmap")
 plt.show()
 # Pehle figure banayein
 fig, ax = plt.subplots()
-st.write("Aapke dataset ke asli columns yeh hain:", df.columns.tolist())
+
 # Phir apna graph banayein (e.g., SNS ya PLT use kar ke)
-sns.histplot(df['Age'], ax=ax)
+sns.histplot(df['tenure'], ax=ax)
 
 # Phir Streamlit ko wo figure pass karein
 st.pyplot(fig)
