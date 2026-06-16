@@ -4,12 +4,3 @@ plotly
 matplotlib
 seaborn
 scikit-learn
-joblit
-LabelEncoder
-StandardScaler
-train_test_split
-KMeans
-DecisionTreeClassifier
-RandomForestClassifier
- linkage, dendrogram
-KNeighborsClassifier
