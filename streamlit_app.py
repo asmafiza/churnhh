@@ -83,6 +83,14 @@ sns.heatmap(
 plt.title("Correlation Heatmap")
 
 st.pyplot(plt)
+# Pehle figure banayein
+fig, ax = plt.subplots()
+
+# Phir apna graph banayein (e.g., SNS ya PLT use kar ke)
+sns.histplot(df['Age'], ax=ax)
+
+# Phir Streamlit ko wo figure pass karein
+st.pyplot(fig)
 
 # Features and Target
 X = df.drop(columns=['Churn']) # Churn aapka target column hoga
