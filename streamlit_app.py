@@ -211,3 +211,54 @@ try:
 
 except Exception as e:
     st.error(f"App ko run karne mein masla aa raha hai: {e}")
+# --- 7. LIVE CHURN PREDICTION SYSTEM ---
+    st.markdown("---")
+    st.header("🔮 5. Live Customer Churn Predictor")
+    st.markdown("Niche diye gaye fields mein customer ka data enter karein aur check karein ke woh company chor kar ja sakta hai ya nahi:")
+
+    # Input form components side-by-side
+    p_col1, p_col2 = st.columns(2)
+    
+    with p_col1:
+        input_tenure = st.number_input(
+            "Customer ka Tenure (Months) likhein:", 
+            min_value=0, 
+            max_value=100, 
+            value=12,
+            help="Customer kitne mahino se aapki services use kar raha hai."
+        )
+        
+    with p_col2:
+        input_charges = st.number_input(
+            "Monthly Charges ($) likhein:", 
+            min_value=0.0, 
+            max_value=200.0, 
+            value=50.0,
+            help="Customer har mahine kitna bill pay karta hai."
+        )
+
+    # Prediction Button
+    if st.button("🚀 Churn Predict Karein"):
+        try:
+            # Saved model ko load karna
+            loaded_model = joblib.load("random_forest_model.pkl")
+            
+            # Input data ko DataFrame format mein banana (Sahi features ke sath)
+            user_features = pd.DataFrame([[input_tenure, input_charges]], columns=["tenure", "MonthlyCharges"])
+            
+            # Live prediction lena
+            prediction = loaded_model.predict(user_features)[0]
+            prediction_proba = loaded_model.predict_proba(user_features)[0][1] # Churn hone ki percentage
+            
+            st.markdown("### **Prediction Result:**")
+            
+            # Agar output 1 hai (Ya 'Yes' encoded hai) to Churn hoga
+            if prediction == 1 or prediction == "Yes":
+                st.error(f"⚠️ **High Risk!** Yeh customer company chor kar **ja sakta hai** (Churn Risk).")
+                st.write(f"📊 **Churn Probability:** {prediction_proba * 100:.1f}% chances hain.")
+            else:
+                st.success(f"✅ **Safe!** Yeh customer loyal lag raha hai, iske company chorne ka **koi khatra nahi hai**.")
+                st.write(f"📊 **Churn Probability:** Only {(prediction_proba) * 100:.1f}% chances hain.")
+                
+        except Exception as pred_error:
+            st.warning(f"Prediction model load hone mein thora waqt le raha hai. Ek baar check karein ke upar ka model training section successfully complete hua hai ya nahi? Error: {pred_error}")
