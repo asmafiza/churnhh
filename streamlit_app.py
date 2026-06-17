@@ -190,7 +190,7 @@ try:
     
     st.markdown("---")
     
-    # --- 6. BUSINESS INSIGHTS ---
+# --- 6. BUSINESS INSIGHTS ---
     st.header("💡 4. Strategic Business Insights")
     ins1, ins2 = st.columns(2)
     with ins1:
@@ -198,8 +198,7 @@ try:
         st.success("**2. Targeted Discounts:**\n\nRisky clusters ko churn hone se bachane ke liye unhein customized packages aur promo discounts offer kiye ja sakte hain.")
     with ins2:
         st.warning("**3. Marketing Campaigns Using Clusters:**\n\nK-Means ke banaye gaye clusters ko use kar ke marketing team har type ke customer group ko target kar sakti hai.")
-        st.help("**4. Retention Strategy:**\n\nHigh tenure wale loyal customers ko long-term contracts ke zariye retain rakhna company ke liye sab se behtar hai.")
-
+        st.error("**4. Retention Strategy:**\n\nHigh tenure wale loyal customers ko long-term contracts ke zariye retain rakhna company ke liye sab se behtar hai.")
     # --- 7. MODEL SAVING SECTION (BACKGROUND) ---
     # Background mein RandomForest model save kar rahe hain jo aakhir mein tha
     X_rf = df_encoded[["tenure", "MonthlyCharges"]]
