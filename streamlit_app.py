@@ -24,23 +24,31 @@ st.markdown("---")
 # --- 2. DATA LOADING & CLEANING ---
 @st.cache_data
 def load_and_clean_data():
-    # File load karna
+    # 1. File load karna
     df = pd.read_csv("WA_Fn-UseC_-Telco-Customer-Churn.csv")
     
-    # CustomerID drop karna
+    # 2. CustomerID drop karna
     if "customerID" in df.columns:
         df.drop("customerID", axis=1, inplace=True)
         
-    # TotalCharges numeric convert karna
+    # 3. TotalCharges ko numeric convert karna aur khali cells bharna
     df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
     df["TotalCharges"] = df["TotalCharges"].fillna(df["TotalCharges"].median())
     
-    # Categorical Data ko Encode karna (Label Encoding)
-    le = LabelEncoder()
-    df_encoded = df.copy()
-    for col in df_encoded.columns:
-        if df_encoded[col].dtype == "object":
-            df_encoded[col] = le.fit_transform(df_encoded[col])
+    # 4. Target variable 'Churn' ko pehle hi 0 aur 1 mein convert kar letay hain
+    if 'Churn' in df.columns:
+        df['Churn_Numeric'] = df['Churn'].apply(lambda x: 1 if str(x).strip().lower() in ['yes', '1'] else 0)
+    
+    # 5. Baqi saare text columns ko automatic 0/1 (One-Hot Encoding) mein badlein
+    # Churn column ko drop kar ke encode karenge taake target duplicate na ho
+    X_raw = df.drop(columns=['Churn', 'Churn_Numeric'], errors='ignore')
+    df_encoded = pd.get_dummies(X_raw, drop_first=True)
+    
+    # Target ko encoded data mein wapas add kar dein
+    df_encoded['Churn'] = df['Churn_Numeric']
+    
+    # Boolean data (True/False) ko pure numbers (1/0) mein badlein taake sklearn ko gussa na aaye
+    df_encoded = df_encoded.astype(float)
             
     return df, df_encoded
 
