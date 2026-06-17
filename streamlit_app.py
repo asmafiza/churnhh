@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -12,42 +12,32 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.cluster import KMeans
 from scipy.cluster.hierarchy import linkage, dendrogram
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import joblib
 
 # --- 1. PAGE SETUP & CONFIG ---
 st.set_page_config(page_title="Telco Churn Analytics Dashboard", layout="wide")
 st.title("📊 Telco Customer Churn - End-to-End Analytics Dashboard")
-st.markdown("Yeh dashboard aapke data ki cleaning, EDA, Supervised ML Comparison, Unsupervised Clustering, aur Business Insights ko ek sath screen par show karta hai.")
+st.markdown("Yeh dashboard aapke data ki cleaning, EDA, Supervised ML Comparison, Unsupervised Clustering, aur **Live Customer Prediction** ko ek sath screen par show karta hai.")
 st.markdown("---")
 
-# --- 2. DATA LOADING & CLEANING ---
+# --- 2. DATA LOADING & CLEANING (FOOLPROOF ENGINE) ---
 @st.cache_data
 def load_and_clean_data():
-    # 1. File load karna
     df = pd.read_csv("WA_Fn-UseC_-Telco-Customer-Churn.csv")
     
-    # 2. CustomerID drop karna
     if "customerID" in df.columns:
         df.drop("customerID", axis=1, inplace=True)
         
-    # 3. TotalCharges ko numeric convert karna aur khali cells bharna
     df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
     df["TotalCharges"] = df["TotalCharges"].fillna(df["TotalCharges"].median())
     
-    # 4. Target variable 'Churn' ko pehle hi 0 aur 1 mein convert kar letay hain
     if 'Churn' in df.columns:
         df['Churn_Numeric'] = df['Churn'].apply(lambda x: 1 if str(x).strip().lower() in ['yes', '1'] else 0)
     
-    # 5. Baqi saare text columns ko automatic 0/1 (One-Hot Encoding) mein badlein
-    # Churn column ko drop kar ke encode karenge taake target duplicate na ho
     X_raw = df.drop(columns=['Churn', 'Churn_Numeric'], errors='ignore')
     df_encoded = pd.get_dummies(X_raw, drop_first=True)
-    
-    # Target ko encoded data mein wapas add kar dein
     df_encoded['Churn'] = df['Churn_Numeric']
-    
-    # Boolean data (True/False) ko pure numbers (1/0) mein badlein taake sklearn ko gussa na aaye
     df_encoded = df_encoded.astype(float)
             
     return df, df_encoded
@@ -69,7 +59,6 @@ try:
     
     # --- 3. EXPLORATORY DATA ANALYSIS (EDA) ---
     st.header("📈 1. Exploratory Data Analysis (EDA)")
-    
     eda_col1, eda_col2, eda_col3 = st.columns(3)
     
     with eda_col1:
@@ -95,15 +84,12 @@ try:
     # --- 4. SUPERVISED LEARNING (MODEL COMPARISON) ---
     st.header("🤖 2. Supervised Learning - Model Comparison")
     
-    # Features and Target prep
-    X = df_encoded.drop(columns=['Churn'])
+    X = df_encoded.drop(columns=['Churn'], errors='ignore')
     y = df_encoded["Churn"]
     
-    # Scaling
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     
-    # Train Test Split
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
     
     models = {
@@ -117,14 +103,11 @@ try:
     results = []
     confusion_matrices = {}
     
-    # Training Models
     for name, model in models.items():
         model.fit(X_train, y_train)
         pred = model.predict(X_test)
         
-        # Metrics
         acc = accuracy_score(y_test, pred)
-        # Kyunki label encoder se encoding hui hai, 1 ya 0 check karein precision ke liye
         prec = precision_score(y_test, pred, zero_division=0)
         rec = recall_score(y_test, pred, average='macro', zero_division=0)
         f1 = f1_score(y_test, pred, average='macro', zero_division=0)
@@ -132,12 +115,9 @@ try:
         results.append([name, acc, prec, rec, f1])
         confusion_matrices[name] = confusion_matrix(y_test, pred)
         
-    # Results DataFrame
     results_df = pd.DataFrame(results, columns=["Model", "Accuracy", "Precision", "Recall", "F1"])
     
-    # Side by side: Metrics table and Comparison graph
     ml_col1, ml_col2 = st.columns([1, 1])
-    
     with ml_col1:
         st.subheader("Models Performance Table")
         st.dataframe(results_df.style.format({"Accuracy": "{:.2%}", "Precision": "{:.2%}", "Recall": "{:.2%}", "F1": "{:.2%}"}))
@@ -149,7 +129,6 @@ try:
         plt.xticks(rotation=20)
         st.pyplot(fig_bar)
         
-    # Selected Model Confusion Matrix
     st.subheader("🔍 Confusion Matrix Explorer")
     selected_model_name = st.selectbox("Kisi bhi model ki Confusion Matrix dekhne ke liye select karein:", list(models.keys()))
     
@@ -163,19 +142,15 @@ try:
     # --- 5. UNSUPERVISED LEARNING (CLUSTERING) ---
     st.header("🎯 3. Unsupervised Learning - Customer Segmentation")
     
-    # K-Means Clustering
     kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
     clusters = kmeans.fit_predict(X_scaled)
     df["Cluster"] = clusters
     
     cluster_col1, cluster_col2 = st.columns(2)
-    
     with cluster_col1:
         st.subheader("K-Means Customer Segmentation Graph")
         fig_cluster, ax_cluster = plt.subplots(figsize=(6, 4))
         sns.scatterplot(x=df["tenure"], y=df["MonthlyCharges"], hue=df["Cluster"], palette="Set1", ax=ax_cluster)
-        ax_cluster.set_xlabel("Tenure")
-        ax_cluster.set_ylabel("Monthly Charges")
         st.pyplot(fig_cluster)
         
     with cluster_col2:
@@ -190,7 +165,7 @@ try:
     
     st.markdown("---")
     
-# --- 6. BUSINESS INSIGHTS ---
+    # --- 6. BUSINESS INSIGHTS ---
     st.header("💡 4. Strategic Business Insights")
     ins1, ins2 = st.columns(2)
     with ins1:
@@ -199,8 +174,13 @@ try:
     with ins2:
         st.warning("**3. Marketing Campaigns Using Clusters:**\n\nK-Means ke banaye gaye clusters ko use kar ke marketing team har type ke customer group ko target kar sakti hai.")
         st.error("**4. Retention Strategy:**\n\nHigh tenure wale loyal customers ko long-term contracts ke zariye retain rakhna company ke liye sab se behtar hai.")
-    # --- 7. MODEL SAVING SECTION (BACKGROUND) ---
-    # Background mein RandomForest model save kar rahe hain jo aakhir mein tha
+
+    # --- 7. LIVE CHURN PREDICTION SYSTEM ---
+    st.markdown("---")
+    st.header("🔮 5. Live Customer Churn Predictor")
+    st.markdown("Niche diye gaye fields mein customer ka data enter karein aur check karein ke woh company chor kar ja sakta hai ya nahi:")
+
+    # Background mein model ko dobara train kar ke save kar rahe hain taake live prediction chalay
     X_rf = df_encoded[["tenure", "MonthlyCharges"]]
     y_rf = df_encoded["Churn"]
     X_train_rf, X_test_rf, y_train_rf, y_test_rf = train_test_split(X_rf, y_rf, test_size=0.2, random_state=42)
@@ -209,56 +189,27 @@ try:
     rf.fit(X_train_rf, y_train_rf)
     joblib.dump(rf, "random_forest_model.pkl")
 
+    # Inputs for Prediction
+    p_col1, p_col2 = st.columns(2)
+    with p_col1:
+        input_tenure = st.number_input("Customer ka Tenure (Months) likhein:", min_value=0, max_value=100, value=12)
+    with p_col2:
+        input_charges = st.number_input("Monthly Charges ($) likhein:", min_value=0.0, max_value=200.0, value=50.0)
+
+    if st.button("🚀 Churn Predict Karein"):
+        loaded_model = joblib.load("random_forest_model.pkl")
+        user_features = pd.DataFrame([[input_tenure, input_charges]], columns=["tenure", "MonthlyCharges"])
+        
+        prediction = loaded_model.predict(user_features)[0]
+        prediction_proba = loaded_model.predict_proba(user_features)[0][1]
+        
+        st.markdown("### **Prediction Result:**")
+        if prediction == 1:
+            st.error(f"⚠️ **High Risk!** Yeh customer company chor kar **ja sakta hai** (Churn Risk).")
+            st.write(f"📊 **Churn Probability:** {prediction_proba * 100:.1f}% chances hain.")
+        else:
+            st.success(f"✅ **Safe!** Yeh customer loyal lag raha hai, iske company chorne ka **koi khatra nahi hai**.")
+            st.write(f"📊 **Churn Probability:** Only {prediction_proba * 100:.1f}% chances hain.")
+
 except Exception as e:
     st.error(f"App ko run karne mein masla aa raha hai: {e}")
-# --- 7. LIVE CHURN PREDICTION SYSTEM ---
-    st.markdown("---")
-    st.header("🔮 5. Live Customer Churn Predictor")
-    st.markdown("Niche diye gaye fields mein customer ka data enter karein aur check karein ke woh company chor kar ja sakta hai ya nahi:")
-
-    # Input form components side-by-side
-    p_col1, p_col2 = st.columns(2)
-    
-    with p_col1:
-        input_tenure = st.number_input(
-            "Customer ka Tenure (Months) likhein:", 
-            min_value=0, 
-            max_value=100, 
-            value=12,
-            help="Customer kitne mahino se aapki services use kar raha hai."
-        )
-        
-    with p_col2:
-        input_charges = st.number_input(
-            "Monthly Charges ($) likhein:", 
-            min_value=0.0, 
-            max_value=200.0, 
-            value=50.0,
-            help="Customer har mahine kitna bill pay karta hai."
-        )
-
-    # Prediction Button
-    if st.button("🚀 Churn Predict Karein"):
-        try:
-            # Saved model ko load karna
-            loaded_model = joblib.load("random_forest_model.pkl")
-            
-            # Input data ko DataFrame format mein banana (Sahi features ke sath)
-            user_features = pd.DataFrame([[input_tenure, input_charges]], columns=["tenure", "MonthlyCharges"])
-            
-            # Live prediction lena
-            prediction = loaded_model.predict(user_features)[0]
-            prediction_proba = loaded_model.predict_proba(user_features)[0][1] # Churn hone ki percentage
-            
-            st.markdown("### **Prediction Result:**")
-            
-            # Agar output 1 hai (Ya 'Yes' encoded hai) to Churn hoga
-            if prediction == 1 or prediction == "Yes":
-                st.error(f"⚠️ **High Risk!** Yeh customer company chor kar **ja sakta hai** (Churn Risk).")
-                st.write(f"📊 **Churn Probability:** {prediction_proba * 100:.1f}% chances hain.")
-            else:
-                st.success(f"✅ **Safe!** Yeh customer loyal lag raha hai, iske company chorne ka **koi khatra nahi hai**.")
-                st.write(f"📊 **Churn Probability:** Only {(prediction_proba) * 100:.1f}% chances hain.")
-                
-        except Exception as pred_error:
-            st.warning(f"Prediction model load hone mein thora waqt le raha hai. Ek baar check karein ke upar ka model training section successfully complete hua hai ya nahi? Error: {pred_error}")
