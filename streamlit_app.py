@@ -141,7 +141,7 @@ try:
         st.pyplot(fig_bar)
         
     # Interactive selection for Confusion Matrix visualization
-    st.subheader(" Confusion Matrix Explorer")
+    st.subheader("🔍 Confusion Matrix Explorer")
     selected_model_name = st.selectbox("Select a model to view its Confusion Matrix:", list(models.keys()))
     
     fig_cm, ax_cm = plt.subplots(figsize=(4, 3))
@@ -152,7 +152,7 @@ try:
     st.markdown("---")
     
     # --- 5. UNSUPERVISED LEARNING (CLUSTERING) ---
-    st.header(" 3. Unsupervised Learning - Customer Segmentation")
+    st.header("🎯 3. Unsupervised Learning - Customer Segmentation")
     
     # Train K-Means Clustering algorithm
     kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
@@ -173,7 +173,56 @@ try:
         dendrogram(linked, ax=ax_dendro, no_labels=True)
         st.pyplot(fig_dendro)
         
-    st.subheader(" Cluster Profile (Mean Analysis)")
+    st.subheader("📋 Cluster Profile (Mean Analysis)")
     st.dataframe(df.groupby("Cluster").mean(numeric_only=True))
     
     st.markdown("---")
+    
+    # --- 6. STRATEGIC BUSINESS INSIGHTS ---
+    st.header("💡 4. Strategic Business Insights")
+    ins1, ins2 = st.columns(2)
+    with ins1:
+        st.info("**1. High Churn Risk Identification:**\n\nData indicates that low tenure (early stage) and high Monthly Charges represent the core subset of users driving high churn volume.")
+        st.success("**2. Targeted Discounts:**\n\nProvide tailored discount options and multi-month contracts to targeted high-risk segments before the end of their introductory lifecycle.")
+    with ins2:
+        st.warning("**3. Marketing Campaigns Using Clusters:**\n\nUtilize identified K-Means partitions to deliver distinct retention initiatives personalized to unique consumer clusters.")
+        st.error("**4. Retention Strategy:**\n\nEnforce aggressive loyalty strategies on high-tenure tiers to preserve high lifecycle value segments effectively.")
+
+    # --- 7. LIVE CHURN PREDICTION SYSTEM ---
+    st.markdown("---")
+    st.header("🔮 5. Live Customer Churn Predictor")
+    st.markdown("Provide real-time structural metrics below to determine individual customer churn risk probabilities using the core predictive engine:")
+
+    # Explicit training for live scoring pipeline utilizing continuous feature parameters
+    X_rf = df_encoded[["tenure", "MonthlyCharges"]]
+    y_rf = df_encoded["Churn"]
+    X_train_rf, X_test_rf, y_train_rf, y_test_rf = train_test_split(X_rf, y_rf, test_size=0.2, random_state=42)
+    
+    rf = RandomForestClassifier(random_state=42)
+    rf.fit(X_train_rf, y_train_rf)
+    joblib.dump(rf, "random_forest_model.pkl")
+
+    # Interactive deployment forms for user metrics input
+    p_col1, p_col2 = st.columns(2)
+    with p_col1:
+        input_tenure = st.number_input("Enter Customer Tenure (in Months):", min_value=0, max_value=100, value=12)
+    with p_col2:
+        input_charges = st.number_input("Enter Monthly Charges ($):", min_value=0.0, max_value=200.0, value=50.0)
+
+    if st.button("🚀 Predict Churn Risk"):
+        loaded_model = joblib.load("random_forest_model.pkl")
+        user_features = pd.DataFrame([[input_tenure, input_charges]], columns=["tenure", "MonthlyCharges"])
+        
+        prediction = loaded_model.predict(user_features)[0]
+        prediction_proba = loaded_model.predict_proba(user_features)[0][1]
+        
+        st.markdown("### **Prediction Result:**")
+        if prediction == 1:
+            st.error(f"⚠️ **High Churn Risk!** This customer is likely to cancel their subscription service.")
+            st.write(f"📊 **Churn Probability:** {prediction_proba * 100:.1f}% confidence score.")
+        else:
+            st.success(f"✅ **Loyal Customer!** This customer profile appears safe with negligible attrition risk.")
+            st.write(f"📊 **Churn Probability:** Only {prediction_proba * 100:.1f}% confidence score.")
+
+except Exception as e:
+    st.error(f"An error occurred while loading or parsing dashboard operations: {e}")
